@@ -210,4 +210,4 @@ const mainLoop = () => {
   }
 };
 
-setInterval(mainLoop, 2000);
+setInterval(mainLoop, 1000 * 60);
