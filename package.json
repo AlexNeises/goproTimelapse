@@ -1,0 +1,23 @@
+{
+  "name": "gopro-timelapse",
+  "author": {
+    "name": "Alex Neises",
+    "email": "alex@neis.es",
+    "url": "https://www.nexview.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlexNeises/goproTimelapse.git"
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "engines": {
+    "node": "15.x.x"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.778.0",
+    "jimp": "^0.16.1",
+    "luxon": "^1.25.0"
+  }
+}
