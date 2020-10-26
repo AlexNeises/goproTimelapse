@@ -48,7 +48,7 @@ const getFilename = () => {
       if (data.KeyCount) {
         const filename = ('00000' + (parseInt(data.Contents.sort((a, b) => {
           return new Date(b.LastModified) - new Date(a.LastModified);
-        })[0].Key.split('.').slice(0, -1).join('.')) + 1)).slice(-5) + '.jpg';
+        })[0].Key.split('.').slice(0, -1).join('.')) + 1)).slice(-6) + '.jpg';
         return resolve(filename);
       } else {
         return resolve('000001.jpg');
