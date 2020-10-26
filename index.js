@@ -46,12 +46,12 @@ const getFilename = () => {
         return reject();
       }
       if (data.KeyCount) {
-        const filename = ('0000' + (parseInt(data.Contents.sort((a, b) => {
+        const filename = ('00000' + (parseInt(data.Contents.sort((a, b) => {
           return new Date(b.LastModified) - new Date(a.LastModified);
         })[0].Key.split('.').slice(0, -1).join('.')) + 1)).slice(-5) + '.jpg';
         return resolve(filename);
       } else {
-        return resolve('00001.jpg');
+        return resolve('000001.jpg');
       }
     });
   });
