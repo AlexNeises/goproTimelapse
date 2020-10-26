@@ -7,11 +7,14 @@ const { password, bucket } = require('./config.json');
 const credentials = new AWS.SharedIniFileCredentials({ profile: 'timelapse' });
 AWS.config.credentials = credentials;
 
+let previousFile = '';
+
 const deleteFromCamera = () => {
   return new Promise((resolve, reject) => {
+    console.log(previousFile);
     const options = {
       hostname: '10.5.5.9',
-      path: `/camera/DL?t=${ password }`,
+      path: `/camera/DF?t=${ password }&p=%15${ previousFile }`,
       method: 'GET'
     };
 
@@ -140,6 +143,39 @@ const getPictureLocation = () => {
   });
 };
 
+const getLastFile = () => {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: '10.5.5.9',
+      port: 8080,
+      path: '/gp/gpMediaList',
+      method: 'GET'
+    };
+
+    http.request(options, res => {
+      if (res.statusCode !== 200) {
+        console.error('Error retrieving files.');
+        return reject();
+      }
+      res.setEncoding('utf-8');
+      let data = '';
+      res.on('data', chunk => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        const files = JSON.parse(data);
+        const dir = files.media[files.media.length - 1];
+        const fn = dir.fs[dir.fs.length - 1];
+        previousFile = `${ dir.d }/${ fn.n }`;
+        return resolve();
+      });
+    }).on('error', e => {
+      console.error(e);
+      return reject();
+    }).end();
+  });
+};
+
 const takePicture = () => {
   return new Promise((resolve, reject) => {
     const options = {
@@ -184,8 +220,12 @@ const initializeCamera = () => {
       }
       res.on('data', () => { });
       res.on('end', () => {
-        return takePicture().then(() => {
-          return resolve();
+        return getLastFile().then(() => {
+          return takePicture().then(() => {
+            return resolve();
+          }).catch(() => {
+            return reject();
+          });
         }).catch(() => {
           return reject();
         });
