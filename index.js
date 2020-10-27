@@ -263,13 +263,3 @@ const mainLoop = () => {
 };
 
 setInterval(mainLoop, 1000 * 60);
-
-
-s3.listObjectsV2({ Bucket: 'neises-timelapse' }, (err, data) => {
-if (data.KeyCount) {
-const filename = data.Contents.sort((a, b) => {
-return new Date(b.LastModified) - new Date(a.LastModified);
-})[0].Key;
-console.log(filename);
-}
-})
