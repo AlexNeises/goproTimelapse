@@ -1,6 +1,7 @@
 const http = require('http');
 const Jimp = require('jimp');
 const AWS = require('aws-sdk');
+const { exec } = require('child_process');
 const { DateTime } = require('luxon');
 const { password, bucket } = require('./config.json');
 
@@ -49,13 +50,24 @@ const getFilename = () => {
         return reject();
       }
       if (data.KeyCount) {
-        const filename = ('00000' + (parseInt(data.Contents.sort((a, b) => {
-          return new Date(b.LastModified) - new Date(a.LastModified);
-        })[0].Key.split('.').slice(0, -1).join('.')) + 1)).slice(-6) + '.jpg';
-        return resolve(filename);
+        return exec(`aws s3 ls ${ bucket } --recursive | sort | tail -n 1 | awk '{print $4}'`, (error, stdout, stderr) => {
+          if (error) {
+            console.error(error);
+            return reject();
+          }
+          if (stderr) {
+            console.error(stderr);
+            return reject();
+          }
+          console.log(stdout);
+          const filename = ('00000' + (parseInt(stdout.split('.').slice(0, -1).join('.')) + 1)).slice(-6) + '.jpg';
+          console.log(filename);
+          return resolve(filename);
+        });
       } else {
         return resolve('000001.jpg');
       }
+
     });
   });
 };
@@ -251,3 +263,13 @@ const mainLoop = () => {
 };
 
 setInterval(mainLoop, 1000 * 60);
+
+
+s3.listObjectsV2({ Bucket: 'neises-timelapse' }, (err, data) => {
+if (data.KeyCount) {
+const filename = data.Contents.sort((a, b) => {
+return new Date(b.LastModified) - new Date(a.LastModified);
+})[0].Key;
+console.log(filename);
+}
+})
