@@ -59,9 +59,7 @@ const getFilename = () => {
             console.error(stderr);
             return reject();
           }
-          console.log(stdout);
           const filename = ('00000' + (parseInt(stdout.split('.').slice(0, -1).join('.')) + 1)).slice(-6) + '.jpg';
-          console.log(filename);
           return resolve(filename);
         });
       } else {
